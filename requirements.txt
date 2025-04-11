@@ -4,3 +4,5 @@ gymnasium==1.0.0
 numpy==2.2.3
 pygame==2.6.1
 typing_extensions==4.12.2
+torch==2.6.0+cu118
+matplotlib==3.10.1

@@ -60,6 +60,7 @@ class QueenWorld(gym.Env):
             'regions': self.regions.copy()
         }
 
+    
     def step(self, action):
         self.attempts += 1
         x = action // self.grid_size
@@ -77,11 +78,10 @@ class QueenWorld(gym.Env):
         elif new_state == 0:
             self.queens_placed -= 1
 
-
         # Queen rewards 
         QUEEN_ADD = 1
-        QUEEN_REMOVE = -1000
-        QUEEN_INVALID = -1000
+        QUEEN_REMOVE = -10
+        QUEEN_INVALID = -10
         QUEEN_VALID = 1
 
         # Cross rewards 
@@ -171,8 +171,14 @@ class QueenWorld(gym.Env):
             if row_crosses == self.grid_size:
                 reward += CROSS_INVALID
 
-        
-        return self._get_obs(), reward, False, {}
+
+        if self.attempts == self.grid_size * self.grid_size * 2:
+            done = True
+            self.attempts = 0
+        else:
+            done = False
+
+        return self._get_obs(), reward, done, {}
 
 
 
@@ -298,12 +304,12 @@ class QueenWorld(gym.Env):
             return action
 
 if __name__ == '__main__':
-    # grid = np.array(
-    #             [[0, 0, 0, 0, 1], 
-    #              [0, 0, 0, 1, 1], 
-    #              [0, 2, 3, 1, 1],
-    #              [4, 2, 3, 3, 1],
-    #              [4, 2, 2, 3, 3]])
+    grid = np.array(
+                [[0, 0, 0, 0, 1], 
+                 [0, 0, 0, 1, 1], 
+                 [0, 2, 3, 1, 1],
+                 [4, 2, 3, 3, 1],
+                 [4, 2, 2, 3, 3]])
 
     # grid = np.array(
     #             [[1,1,0,0,0,0,0],
@@ -315,16 +321,16 @@ if __name__ == '__main__':
     #              [0,0,0,0,6,6,6]])
 
 
-    grid = np.array(
-                [[8, 8, 1, 1, 2, 3, 3, 3, 3], 
-                 [8, 8, 1, 2, 2, 2, 7, 7, 3],
-                 [8, 8, 5, 5, 2, 5, 5, 7, 3],
-                 [8, 5, 5, 5, 5, 5, 5, 5, 3],
-                 [8, 5, 5, 5, 5, 5, 5, 5, 3],
-                 [8, 8, 5, 5, 5, 5, 5, 3, 3],
-                 [8, 8, 6, 5, 5, 5, 3, 3, 4],
-                 [8, 6, 6, 6, 5, 0, 3, 3, 4],
-                 [8, 8, 8, 6, 0, 0, 4, 4, 4]])
+    # grid = np.array(
+    #             [[8, 8, 1, 1, 2, 3, 3, 3, 3], 
+    #              [8, 8, 1, 2, 2, 2, 7, 7, 3],
+    #              [8, 8, 5, 5, 2, 5, 5, 7, 3],
+    #              [8, 5, 5, 5, 5, 5, 5, 5, 3],
+    #              [8, 5, 5, 5, 5, 5, 5, 5, 3],
+    #              [8, 8, 5, 5, 5, 5, 5, 3, 3],
+    #              [8, 8, 6, 5, 5, 5, 3, 3, 4],
+    #              [8, 6, 6, 6, 5, 0, 3, 3, 4],
+    #              [8, 8, 8, 6, 0, 0, 4, 4, 4]])
 
     env = QueenWorld(grid)
     env.reset()
@@ -337,7 +343,7 @@ if __name__ == '__main__':
         # for event in pygame.event.get():
         #     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
         #         action = env.click(event.pos)
-        #
+        
         #         # action = np.random.randint(env.action_space.n)
         #         if action is not None:
         #             _, reward, done, _ = env.step(action)
@@ -347,9 +353,10 @@ if __name__ == '__main__':
 
         action = np.random.randint(env.action_space.n)
         _, reward, done, _ = env.step(action)
+        r += reward
         env.render()
         # pygame.time.wait(100)
-
+    print(r)
     env.close()
 
 
